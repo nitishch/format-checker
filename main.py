@@ -1,9 +1,14 @@
 import os
 from flask import Flask
+from flask import request
 app = Flask(__name__)
 
-@app.route('/')
+@app.route('/verify-results', methods=['GET'])
 def hello():
+    return "excellent!"
+
+@app.route('/verify-results', methods=['POST'])
+def verify_results():
     return "excellent!"
 
 
