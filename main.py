@@ -13,7 +13,7 @@ def hello():
 
 @app.route('/verify-results', methods=['POST'])
 def verify_results():
-    print('{}'.format(request.data.decode("utf-8")))
+    print('{}'.format(request.form))
     return request.data
 
 
