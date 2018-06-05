@@ -28,8 +28,10 @@ def verify_results():
                     # Travis makes a call only in case of error/failure.
                     gh.post_comment(payload['pull_request_id'])
                     break
-    except KeyError:
-        print('OAUTH_TOKEN environment variable not set')
+    except KeyError as err:
+        print('Key error: {}'.format(err))
+    finally:
+        return "Handled"
 
 
 class GithubHandler():
