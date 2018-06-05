@@ -9,7 +9,8 @@ def hello():
 
 @app.route('/verify-results', methods=['POST'])
 def verify_results():
-    return "excellent!"
+    app.logger.info('%s', request.data)
+    return request.data
 
 
 if __name__ == '__main__':
