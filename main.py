@@ -1,3 +1,4 @@
+import json
 import os
 import sys
 import logging
@@ -13,7 +14,18 @@ def hello():
 
 @app.route('/verify-results', methods=['POST'])
 def verify_results():
-    print('{}'.format(request.form))
+    print("form's content is {}".format(request.form))
+    payload = request.form.get('payload')
+    print('payload is {}'.format(payload))
+    payload = json.loads(payload)
+    print('Job has {}'.format(payload['status']))
+    print('PR: {}'.format(payload['pull_request']))
+    matrix = payload['matrix']
+    for stage in matrix:
+        # We care only about rustfmt stage
+        if stage['config']['stage'] == 'rustfmt':
+            if stage['stage'] == 'failed':
+                print('Aha! Rustfmt failed. Do the necessary things')
     return request.data
 
 
