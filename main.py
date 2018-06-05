@@ -18,13 +18,13 @@ def verify_results():
     payload = request.form.get('payload')
     print('payload is {}'.format(payload))
     payload = json.loads(payload)
-    print('Job has {}'.format(payload['status']))
+    print('Job has {}'.format(payload['state']))
     print('PR: {}'.format(payload['pull_request']))
     matrix = payload['matrix']
     for stage in matrix:
         # We care only about rustfmt stage
         if stage['config']['stage'] == 'rustfmt':
-            if stage['stage'] == 'failed':
+            if stage['state'] == 'failed':
                 print('Aha! Rustfmt failed. Do the necessary things')
     return request.data
 
