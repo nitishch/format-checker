@@ -1,32 +1,54 @@
 import json
 import os
-import sys
-import logging
+import requests
 from flask import Flask
 from flask import request
 
 app = Flask(__name__)
 
 
-@app.route('/verify-results', methods=['GET'])
+@app.route('/', methods=['GET'])
 def hello():
-    return "excellent!"
+    return "This app is to be used for https://github.com/Wilfred/remacs"
 
 @app.route('/verify-results', methods=['POST'])
 def verify_results():
-    print("form's content is {}".format(request.form))
     payload = request.form.get('payload')
-    print('payload is {}'.format(payload))
     payload = json.loads(payload)
-    print('Job has {}'.format(payload['state']))
-    print('PR: {}'.format(payload['pull_request']))
-    matrix = payload['matrix']
-    for stage in matrix:
-        # We care only about rustfmt stage
-        if stage['config']['stage'] == 'rustfmt':
-            if stage['state'] == 'failed':
-                print('Aha! Rustfmt failed. Do the necessary things')
-    return request.data
+    try:
+        secret = os.environ['OAUTH_TOKEN']
+        gh = GithubHandler(secret)
+        if payload['pull_request']:
+            # This will always be true if Travis is enabled only for pull
+            # requests but keeping it here just in case
+            matrix = payload['matrix']
+            for stage in matrix:
+                # We care only about rustfmt stage
+                if stage['config']['stage'] == 'rustfmt':
+                    # Travis makes a call only in case of error/failure.
+                    gh.post_comment(payload['pull_request_id'])
+                    break
+    except KeyError:
+        print('OAUTH_TOKEN environment variable not set')
+
+
+class GithubHandler():
+    def __init__(secret):
+        self.secret = secret
+        self.base_url = 'https://api.github.com/repos/nitishch/remacs'
+
+    def post_comment(pull_request_id):
+        comment_text = "Code format check failed. Please use `rustfmt` to format the code. For instructions, see [CONTRIBUTING.md](https://github.com/Wilfred/remacs/blob/master/CONTRIBUTING.md)"
+        url = '{}/issues/{}/comments'.format(self.base_url, pull_request_id)
+        headers = {'User-Agent': 'Pesky Bot',
+                   'Accept': 'application/vnd.github.v3+json',
+                   'Authorization': 'token {}'.format(self.secret)
+        }
+        body = {'body': comment_text}
+        response = requests.post(url, json=body, headers=headers)
+        if response.status_code != 201:
+            # Log the response body. This might help for debugging later
+            print('Response {}: {}'.format(response.status_code, response.json()))
 
 
 if __name__ == '__main__':
