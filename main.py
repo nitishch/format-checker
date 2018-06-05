@@ -33,11 +33,11 @@ def verify_results():
 
 
 class GithubHandler():
-    def __init__(secret):
+    def __init__(self, secret):
         self.secret = secret
         self.base_url = 'https://api.github.com/repos/nitishch/remacs'
 
-    def post_comment(pull_request_id):
+    def post_comment(self, pull_request_id):
         comment_text = "Code format check failed. Please use `rustfmt` to format the code. For instructions, see [CONTRIBUTING.md](https://github.com/Wilfred/remacs/blob/master/CONTRIBUTING.md)"
         url = '{}/issues/{}/comments'.format(self.base_url, pull_request_id)
         headers = {'User-Agent': 'Pesky Bot',
