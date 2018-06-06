@@ -15,7 +15,7 @@ def hello():
 def verify_results():
     if not verify_signature(request):
         # Request is bad
-        return
+        return "Bad Request"
     payload = request.form.get('payload')
     payload = json.loads(payload)
     try:
