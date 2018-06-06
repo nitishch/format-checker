@@ -3,7 +3,7 @@ import os
 import requests
 from flask import Flask
 from flask import request
-
+from travis import verify_signature
 app = Flask(__name__)
 
 
@@ -13,7 +13,7 @@ def hello():
 
 @app.route('/verify-results', methods=['POST'])
 def verify_results():
-    print('Headers: {}'.format(request.headers))
+    verify_signature(request)
     payload = request.form.get('payload')
     payload = json.loads(payload)
     try:
