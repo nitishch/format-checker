@@ -13,6 +13,7 @@ def hello():
 
 @app.route('/verify-results', methods=['POST'])
 def verify_results():
+    print('Headers: {}'.format(request.headers))
     payload = request.form.get('payload')
     payload = json.loads(payload)
     try:
