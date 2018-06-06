@@ -13,7 +13,9 @@ def hello():
 
 @app.route('/verify-results', methods=['POST'])
 def verify_results():
-    verify_signature(request)
+    if not verify_signature(request):
+        # Request is bad
+        return
     payload = request.form.get('payload')
     payload = json.loads(payload)
     try:

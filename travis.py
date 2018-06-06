@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# Slightly modified version of https://gist.github.com/andrewgross/8ba32af80ecccb894b82774782e7dcd4
 from __future__ import unicode_literals
 
 import base64
@@ -19,9 +20,7 @@ TRAVIS_CONFIG_URL = 'https://api.travis-ci.com/config'
 
 def verify_signature(request):
     signature = _get_signature(request)
-    print('Signature: {}'.format(signature))
     payload = request.form.get('payload')
-    print('Payload: {}'.format(payload))
     try:
         public_key = _get_travis_public_key()
     except requests.Timeout:
@@ -32,11 +31,10 @@ def verify_signature(request):
         return HttpResponseBadRequest({'status': 'failed'})
     try:
         check_authorized(signature, public_key, payload)
-        print("Check Succeeded")
+        return True
     except SignatureError:
         # Log the failure somewhere
-        print("Check failed")
-        return HttpResponseBadRequest({'status': 'unauthorized'})
+        return False
 
 def check_authorized(signature, public_key, payload):
     """
