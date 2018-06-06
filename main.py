@@ -25,15 +25,16 @@ def verify_results():
             for stage in matrix:
                 # We care only about rustfmt stage
                 if stage['config']['stage'] == 'rustfmt':
+                    if stage['state'] in ['broken', 'failed', 'errored', 'still failing']:
                     # Travis makes a call only in case of error/failure.
-                    gh.post_comment(payload['pull_request_number'])
+                        gh.post_comment(payload['pull_request_number'])
                     break
     except KeyError as err:
         # This may be because of OAUTH_TOKEN not set/JSON format being
         # different from what is expected
         print('Key error: {}'.format(err))
     finally:
-        # Flask expects methods to return something
+        # Flask expects REST end-points to return something
         return "Handled"
 
 
